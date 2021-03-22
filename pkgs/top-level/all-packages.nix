@@ -20704,6 +20704,8 @@ in
 
   hack-font = callPackage ../data/fonts/hack { };
 
+  hackgen = callPackage ../data/fonts/hackgen { };
+
   helvetica-neue-lt-std = callPackage ../data/fonts/helvetica-neue-lt-std { };
 
   hetzner-kube = callPackage ../applications/networking/cluster/hetzner-kube { };
