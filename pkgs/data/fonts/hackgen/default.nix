@@ -1,4 +1,4 @@
-{ stdenv, fetchzip }:
+{ lib, fetchzip }:
 
 let
   version = "v2.3.1";
@@ -14,7 +14,7 @@ in fetchzip {
 
   sha256 = "c4edeeb41882bebee179e593f929418706118c7dcd068672ded2ca99e6991ff7";
 
-  meta = with stdenv.lib {
+  meta = with lib; {
     description = "programming font";
   };
 }
