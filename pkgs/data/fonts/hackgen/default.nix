@@ -9,10 +9,10 @@ in fetchzip {
 
   postFetch = ''
     mkdir -p $out/share/fonts
-    unzip -j $downloadedFile \*.ttf -d $out/share/fonts/truetype
+    unzip -j $downloadedFile \*.ttf -d $out/share/fonts/hackgen
   '';
 
-  sha256 = "c4edeeb41882bebee179e593f929418706118c7dcd068672ded2ca99e6991ff7";
+  sha256 = "1xqzk7k9kjnjvrr8c1ndgn6121l784lzk4z5g7hvxgl232sfxvf4";
 
   meta = with lib; {
     description = "A typeface designed for source code";
