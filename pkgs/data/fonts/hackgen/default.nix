@@ -12,7 +12,7 @@ in fetchzip {
     unzip -j $downloadedFile \*.ttf -d $out/share/fonts/hackgen
   '';
 
-  sha256 = "05l0g8qahhzfr9lxankw93pfqgiyqlki1wy39jrhpp9y317g1391";
+  sha256 = "0a1vp6v18yj5lspxk4n7l1r6ipabmpdwgjflg9alhs3gdwbg952c";
 
   meta = with lib; {
     description = "A typeface designed for source code";
