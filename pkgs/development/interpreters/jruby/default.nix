@@ -6,11 +6,11 @@ rubyVersion = callPackage ../ruby/ruby-version.nix {} "2" "5" "7" "";
 jruby = stdenv.mkDerivation rec {
   pname = "jruby";
 
-  version = "9.2.15.0";
+  version = "9.2.17.0";
 
   src = fetchurl {
     url = "https://s3.amazonaws.com/jruby.org/downloads/${version}/jruby-bin-${version}.tar.gz";
-    sha256 = "sha256-no5dc8QtHa2KeVptw5vYfoj8iGP3bgZeQJnDLQhSBbA=";
+    sha256 = "sha256-dwHTU3s6YG0nZaxtXEDmdd2qAdPOutJqIaZuOq3VwgI=";
   };
 
   nativeBuildInputs = [ makeWrapper ];
@@ -23,7 +23,7 @@ jruby = stdenv.mkDerivation rec {
 
      for i in $out/bin/jruby{,.bash}; do
        wrapProgram $i \
-         --set JAVA_HOME ${jre}
+         --set JAVA_HOME ${jre.home}
      done
 
      ln -s $out/bin/jruby $out/bin/ruby

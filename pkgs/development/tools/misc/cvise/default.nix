@@ -1,17 +1,17 @@
 { lib, buildPythonApplication, fetchFromGitHub, cmake, flex
-, clang-unwrapped, llvm, unifdef
+, libclang, llvm, unifdef
 , pebble, psutil, pytestCheckHook, pytest-flake8
 }:
 
 buildPythonApplication rec {
   pname = "cvise";
-  version = "2.1.0";
+  version = "2.3.0";
 
   src = fetchFromGitHub {
     owner = "marxin";
     repo = "cvise";
     rev = "v${version}";
-    sha256 = "0ljl0r5jqj6lrddrbxjkcphcz5p4njnn2hqz07jyh30jd9sm7dmj";
+    sha256 = "1x2i8nv0nncgvr07znhh2slngbrg8qcsz2zqx76bcyq9hssn6yal";
   };
 
   patches = [
@@ -19,8 +19,8 @@ buildPythonApplication rec {
     ./unifdef.patch
   ];
 
-  nativeBuildInputs = [ cmake flex ];
-  buildInputs = [ clang-unwrapped llvm unifdef ];
+  nativeBuildInputs = [ cmake flex llvm.dev ];
+  buildInputs = [ libclang llvm llvm.dev unifdef ];
   propagatedBuildInputs = [ pebble psutil ];
   checkInputs = [ pytestCheckHook pytest-flake8 unifdef ];
 
