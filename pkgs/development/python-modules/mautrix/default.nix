@@ -1,14 +1,14 @@
 { lib, buildPythonPackage, fetchPypi, aiohttp, pythonOlder
-, sqlalchemy, ruamel_yaml, CommonMark, lxml, fetchpatch
+, sqlalchemy, ruamel_yaml, CommonMark, lxml
 }:
 
 buildPythonPackage rec {
   pname = "mautrix";
-  version = "0.8.16";
+  version = "0.9.8";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "ccaa1691affa5f257e13d61f7c46088ff0affdd782331b01bfdcbd0b3eb5e10e";
+    sha256 = "1yx9ybpw9ppym8k2ky5pxh3f2icpmk887i8ipwixrcrnml3q136p";
   };
 
   propagatedBuildInputs = [

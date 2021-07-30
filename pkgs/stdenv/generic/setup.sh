@@ -1,6 +1,12 @@
 set -eu
 set -o pipefail
 
+if [ -n "${BASH_VERSINFO-}" ] && [ "${BASH_VERSINFO-}" -lt 4 ]; then
+    echo "Detected Bash version that isn't supported by Nixpkgs (${BASH_VERSION})"
+    echo "Please install Bash 4 or greater to continue."
+    exit 1
+fi
+
 if (( "${NIX_DEBUG:-0}" >= 6 )); then
     set -x
 fi
@@ -157,7 +163,8 @@ addToSearchPathWithCustomDelimiter() {
     local delimiter="$1"
     local varName="$2"
     local dir="$3"
-    if [ -d "$dir" ]; then
+    if [[ -d "$dir" && "${!varName:+${delimiter}${!varName}${delimiter}}" \
+          != *"${delimiter}${dir}${delimiter}"* ]]; then
         export "${varName}=${!varName:+${!varName}${delimiter}}${dir}"
     fi
 }
@@ -480,7 +487,7 @@ activatePackage() {
     # build platform are included here. That would be `depsBuild*`,
     # and legacy `nativeBuildInputs`, in general. If we aren't cross
     # compiling, however, everything can be put on the PATH. To ease
-    # the transition, we do include everything in thatcase.
+    # the transition, we do include everything in that case.
     #
     # TODO(@Ericson2314): Don't special-case native compilation
     if [[ -z "${strictDeps-}" || "$hostOffset" -le -1 ]]; then

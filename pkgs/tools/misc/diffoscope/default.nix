@@ -1,26 +1,19 @@
-{ lib, stdenv, fetchurl, runCommand, makeWrapper, python3Packages, docutils, help2man, installShellFiles
-, abootimg, acl, apktool, binutils-unwrapped, build-tools, bzip2, cbfstool, cdrkit, colord, colordiff, coreutils, cpio, db, diffutils, dtc
+{ lib, stdenv, fetchurl, python3Packages, docutils, help2man, installShellFiles
+, abootimg, acl, apksigner, apktool, binutils-unwrapped, bzip2, cbfstool, cdrkit, colord, colordiff, coreutils, cpio, db, diffutils, dtc
 , e2fsprogs, file, findutils, fontforge-fonttools, ffmpeg, fpc, gettext, ghc, ghostscriptX, giflib, gnumeric, gnupg, gnutar
 , gzip, hdf5, imagemagick, jdk, libarchive, libcaca, llvm, lz4, mono, openssh, openssl, pdftk, pgpdump, poppler_utils, qemu, R
-, sng, sqlite, squashfsTools, tcpdump, odt2txt, unzip, wabt, xxd, xz, zip, zstd
+, radare2, sng, sqlite, squashfsTools, tcpdump, odt2txt, unzip, wabt, xxd, xz, zip, zstd
 , enableBloat ? false
 }:
 
 # Note: when upgrading this package, please run the list-missing-tools.sh script as described below!
-let
-  apksigner = runCommand "apksigner" { nativeBuildInputs = [ makeWrapper ]; } ''
-    mkdir -p $out/bin
-    makeWrapper "${jdk}/bin/java" "$out/bin/apksigner" \
-      --add-flags "-jar ${builtins.head build-tools}/libexec/android-sdk/build-tools/28.0.3/lib/apksigner.jar"
-  '';
-in
 python3Packages.buildPythonApplication rec {
   pname = "diffoscope";
-  version = "166";
+  version = "178";
 
   src = fetchurl {
     url = "https://diffoscope.org/archive/diffoscope-${version}.tar.bz2";
-    sha256 = "sha256-6VhHG3MxmIczolOYqU4D1m00h8w2n0ku4dy/dFEYqk0=";
+    sha256 = "sha256-uJbTQshf7vRd6EyaaV0itJVrMc/6o+pPXhtUgrjFnzM=";
   };
 
   outputs = [ "out" "man" ];
@@ -56,7 +49,7 @@ python3Packages.buildPythonApplication rec {
     ++ lib.optionals stdenv.isLinux [ python3Packages.pyxattr acl cdrkit ]
     ++ lib.optionals enableBloat ([
       abootimg apksigner apktool cbfstool colord ffmpeg fpc ghc ghostscriptX giflib gnupg gnumeric
-      hdf5 imagemagick llvm jdk mono odt2txt openssh pdftk poppler_utils qemu R tcpdump wabt
+      hdf5 imagemagick llvm jdk mono odt2txt openssh pdftk poppler_utils qemu R tcpdump wabt radare2
     ] ++ (with python3Packages; [ binwalk guestfs h5py ]));
 
   checkInputs = with python3Packages; [ pytestCheckHook ] ++ pythonPath;
@@ -70,6 +63,9 @@ python3Packages.buildPythonApplication rec {
   disabledTests = [
     "test_android_manifest"
     "test_sbin_added_to_path"
+    "test_diff_meta"
+    "test_diff_meta2"
+    "test_obj_no_differences"
   ];
 
   meta = with lib; {

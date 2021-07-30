@@ -11,11 +11,11 @@
 
 buildPythonPackage rec {
   pname = "howdoi";
-  version = "2.0.12";
+  version = "2.0.16";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "bab3eab349ec0b534cf1b05a563d45e4d301b914c53a7f2c3446fdcc60497c93";
+    sha256 = "0257fbb328eb3a15ed3acc498314902f00908b130209073509eec21cb7235b2b";
   };
 
   postPatch = ''

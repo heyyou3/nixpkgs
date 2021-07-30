@@ -1,20 +1,23 @@
 { stdenv, lib, fetchurl, unzip }:
 
 let
-  version = "3.2.63";
+  version = "3.5.15";
   src =
     if stdenv.hostPlatform.system == "x86_64-darwin" then
-      fetchurl {
-        url = "https://update.tabnine.com/bundles/${version}/x86_64-apple-darwin/TabNine.zip";
-        sha256 = "0y0wb3jdr2qk4k21c11w8c9a5fl0h2rm1wm7m8hqdywy4lz9ppgy";
-      }
+      fetchurl
+        {
+          url = "https://update.tabnine.com/bundles/${version}/x86_64-apple-darwin/TabNine.zip";
+          sha256 = "sha256-JrDAF/3yPGJXwonWIvaKf0dw4GQf3U2wbf5iF4QUXco=";
+        }
     else if stdenv.hostPlatform.system == "x86_64-linux" then
-      fetchurl {
-        url = "https://update.tabnine.com/bundles/${version}/x86_64-unknown-linux-musl/TabNine.zip";
-        sha256 = "0zzk2w5azk5f0svjxlj2774x01xdflb767xxvbglj4223dgyx2x5";
-      }
+      fetchurl
+        {
+          url = "https://update.tabnine.com/bundles/${version}/x86_64-unknown-linux-musl/TabNine.zip";
+          sha256 = "sha256-fgVVJ+J4w+Z3Kmryixp844xlLFiRs5PSAcD/wrcXF1w=";
+        }
     else throw "Not supported on ${stdenv.hostPlatform.system}";
-in stdenv.mkDerivation rec {
+in
+stdenv.mkDerivation rec {
   pname = "tabnine";
 
   inherit version src;
@@ -28,7 +31,12 @@ in stdenv.mkDerivation rec {
   nativeBuildInputs = [ unzip ];
 
   installPhase = ''
+    runHook preInstall
     install -Dm755 TabNine $out/bin/TabNine
+    install -Dm755 TabNine-deep-cloud $out/bin/TabNine-deep-cloud
+    install -Dm755 TabNine-deep-local $out/bin/TabNine-deep-local
+    install -Dm755 WD-TabNine $out/bin/WD-TabNine
+    runHook postInstall
   '';
 
   meta = with lib; {
@@ -36,5 +44,6 @@ in stdenv.mkDerivation rec {
     description = "Smart Compose for code that uses deep learning to help you write code faster";
     license = licenses.unfree;
     platforms = [ "x86_64-darwin" "x86_64-linux" ];
+    maintainers = with maintainers; [ lovesegfault ];
   };
 }

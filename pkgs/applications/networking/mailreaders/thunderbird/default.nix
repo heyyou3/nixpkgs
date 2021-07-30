@@ -50,6 +50,7 @@
 , unzip
 , which
 , writeScript
+, xdg-utils
 , xidel
 , xorg
 , yasm
@@ -58,10 +59,10 @@
 
 , debugBuild ? false
 
-, alsaSupport ? stdenv.isLinux, alsaLib
+, alsaSupport ? stdenv.isLinux, alsa-lib
 , pulseaudioSupport ? stdenv.isLinux, libpulseaudio
 , gtk3Support ? true, gtk2, gtk3, wrapGAppsHook
-, waylandSupport ? true
+, waylandSupport ? true, libdrm
 , libxkbcommon, calendarSupport ? true
 
 # Use official trademarked branding.  Permission obtained at:
@@ -73,13 +74,13 @@ assert waylandSupport -> gtk3Support == true;
 
 stdenv.mkDerivation rec {
   pname = "thunderbird";
-  version = "78.8.0";
+  version = "78.12.0";
 
   src = fetchurl {
     url =
       "mirror://mozilla/thunderbird/releases/${version}/source/thunderbird-${version}.source.tar.xz";
     sha512 =
-      "18hx7qi4nwfbygh1ykczvs7vyvmcqwj4x838lpillimzwjd7chyrbjz2b2h15ckfgndbrxmwvvd3v50bj04xpqigvz18g46nav1mly7";
+      "8a9275f6a454b16215e9440d8b68926e56221dbb416f77ea0cd0a42853bdd26f35514e792564879c387271bd43d8ee966577f133f8ae7781f43e8bec9ab78696";
   };
 
   nativeBuildInputs = [
@@ -99,6 +100,7 @@ stdenv.mkDerivation rec {
     rustc
     which
     yasm
+    unzip
   ] ++ lib.optional gtk3Support wrapGAppsHook;
 
   buildInputs = [
@@ -126,7 +128,6 @@ stdenv.mkDerivation rec {
     pango
     perl
     sqlite
-    unzip
     xorg.libX11
     xorg.libXScrnSaver
     xorg.libXcursor
@@ -137,12 +138,13 @@ stdenv.mkDerivation rec {
     xorg.libXt
     xorg.pixman
     xorg.xorgproto
+    xorg.libXdamage
     zip
     zlib
-  ] ++ lib.optional alsaSupport alsaLib
+  ] ++ lib.optional alsaSupport alsa-lib
     ++ lib.optional gtk3Support gtk3
     ++ lib.optional pulseaudioSupport libpulseaudio
-    ++ lib.optional waylandSupport libxkbcommon;
+    ++ lib.optionals waylandSupport [ libxkbcommon libdrm ];
 
   NIX_CFLAGS_COMPILE =[
     "-I${glib.dev}/include/gio-unix-2.0"
@@ -241,7 +243,7 @@ stdenv.mkDerivation rec {
     "--enable-strip"
   ]) ++ lib.optionals (!stdenv.hostPlatform.isi686) [
     # on i686-linux: --with-libclang-path is not available in this configuration
-    "--with-libclang-path=${llvmPackages.libclang}/lib"
+    "--with-libclang-path=${llvmPackages.libclang.lib}/lib"
     "--with-clang-path=${llvmPackages.clang}/bin/clang"
   ] ++ lib.optional alsaSupport "--enable-alsa"
   ++ lib.optional calendarSupport "--enable-calendar"
@@ -310,6 +312,7 @@ stdenv.mkDerivation rec {
       --set MOZ_LEGACY_PROFILES 1
       --set MOZ_ALLOW_DOWNGRADE 1
       --prefix PATH : "${lib.getBin gnupg}/bin"
+      --prefix PATH : "${lib.getBin xdg-utils}/bin"
       --prefix LD_LIBRARY_PATH : "${lib.getLib gpgme}/lib"
     )
   '';
@@ -334,7 +337,7 @@ stdenv.mkDerivation rec {
     attrPath = "thunderbird-78";
     baseUrl = "http://archive.mozilla.org/pub/thunderbird/releases/";
     inherit writeScript lib common-updater-scripts xidel coreutils gnused
-      gnugrep curl runtimeShell;
+      gnugrep gnupg curl runtimeShell;
   };
 
   requiredSystemFeatures = [ "big-parallel" ];

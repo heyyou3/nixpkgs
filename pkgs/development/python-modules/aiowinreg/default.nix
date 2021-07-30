@@ -2,21 +2,29 @@
 , buildPythonPackage
 , fetchPypi
 , pythonOlder
+, winacl
+, prompt-toolkit
 }:
 
 buildPythonPackage rec {
   pname = "aiowinreg";
-  version = "0.0.4";
+  version = "0.0.6";
 
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "956278a90ef6958f9e2392891b2a305273f695b15b14489cd2097197d6cbe155";
+    sha256 = "0h0r9xrz1n8y75f2p21f7phqrlpsymyiipmgzr0lj591irzjmjjy";
   };
+
+  propagatedBuildInputs = [
+    prompt-toolkit
+    winacl
+  ];
 
   # Project doesn't have tests
   doCheck = false;
+
   pythonImportsCheck = [ "aiowinreg" ];
 
   meta = with lib; {

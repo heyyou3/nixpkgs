@@ -5,6 +5,7 @@
 , dnspython
 , fetchFromGitHub
 , mock
+, pytest-asyncio
 , pytestCheckHook
 , pythonOlder
 , six
@@ -12,14 +13,14 @@
 
 buildPythonPackage rec {
   pname = "mcstatus";
-  version = "5.1.1";
+  version = "6.4.0";
   disabled = pythonOlder "3.6";
 
   src = fetchFromGitHub {
     owner = "Dinnerbone";
     repo = pname;
-    rev = "release-${version}";
-    sha256 = "1a3qrl6w76ayqkl1knaz5ai0brrzpjfdk33lyb1n1p7gnc73nhlr";
+    rev = "v${version}";
+    sha256 = "sha256-pJ5TY9tbdhVW+kou+n5fMgCdHVBK6brBrlGIuO+VIK0=";
   };
 
   propagatedBuildInputs = [
@@ -31,12 +32,9 @@ buildPythonPackage rec {
 
   checkInputs = [
     mock
+    pytest-asyncio
     pytestCheckHook
   ];
-
-  postPatch = ''
-    substituteInPlace requirements.txt --replace "dnspython3" "dnspython"
-  '';
 
   pythonImportsCheck = [ "mcstatus" ];
 

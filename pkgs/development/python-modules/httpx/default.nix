@@ -11,21 +11,21 @@
 , pytestCheckHook
 , pytest-asyncio
 , pytest-trio
-, pytestcov
+, pytest-cov
 , trustme
 , uvicorn
 }:
 
 buildPythonPackage rec {
   pname = "httpx";
-  version = "0.17.0";
+  version = "0.18.0";
   disabled = pythonOlder "3.6";
 
   src = fetchFromGitHub {
     owner = "encode";
     repo = pname;
     rev = version;
-    sha256 = "sha256-pRdhPAxKZOVbRhOm4881Dn+IRtpX5T3oFuYdtWp3cgY=";
+    sha256 = "sha256-6EYBTRXaVHBgW/JzZvWLz55AqgocOyym2FVtu2Nkp/U=";
   };
 
   propagatedBuildInputs = [
@@ -41,7 +41,7 @@ buildPythonPackage rec {
     pytestCheckHook
     pytest-asyncio
     pytest-trio
-    pytestcov
+    pytest-cov
     trustme
     uvicorn
   ];

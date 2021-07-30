@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchurl, yacc, flex, libusb-compat-0_1, libelf, libftdi1, readline
+{ lib, stdenv, fetchurl, bison, flex, libusb-compat-0_1, libelf, libftdi1, readline
 # docSupport is a big dependency, disabled by default
 , docSupport ? false, texLive ? null, texinfo ? null, texi2html ? null
 }:
@@ -6,16 +6,17 @@
 assert docSupport -> texLive != null && texinfo != null && texi2html != null;
 
 stdenv.mkDerivation rec {
-  name = "avrdude-6.3";
+  pname = "avrdude";
+  version = "6.3";
 
   src = fetchurl {
-    url = "mirror://savannah/avrdude/${name}.tar.gz";
+    url = "mirror://savannah/${pname}/${pname}-${version}.tar.gz";
     sha256 = "15m1w1qad3dj7r8n5ng1qqcaiyx1gyd6hnc3p2apgjllccdp77qg";
   };
 
   configureFlags = lib.optionals docSupport "--enable-doc";
 
-  buildInputs = [ yacc flex libusb-compat-0_1 libelf libftdi1 readline ]
+  buildInputs = [ bison flex libusb-compat-0_1 libelf libftdi1 readline ]
     ++ lib.optionals docSupport [ texLive texinfo texi2html ];
 
   meta = with lib; {

@@ -1,37 +1,48 @@
 { lib
-, buildPythonPackage
-, fetchFromGitHub
 , aiohttp
 , asynctest
-, stdiomask
+, buildPythonPackage
 , cryptography
-, pytestcov
+, fetchFromGitHub
 , pytest-asyncio
 , pytestCheckHook
+, pythonOlder
+, stdiomask
 }:
 
 buildPythonPackage rec {
   pname = "subarulink";
-  version = "0.3.12";
+  version = "0.3.14";
+  disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "G-Two";
     repo = pname;
-    rev = "subaru-v${version}";
-    sha256 = "0mhy4np3g10k778062sp2q65cfjhp4y1fghn8yvs6qg6jmg047z6";
+    rev = "v${version}";
+    sha256 = "0xwiw50xc0k8r00k33crsl5wb01n2dz5rzhy96y7vr3zj4kfypsp";
   };
 
-  propagatedBuildInputs = [ aiohttp stdiomask ];
+  propagatedBuildInputs = [
+    aiohttp
+    stdiomask
+  ];
 
   checkInputs = [
     asynctest
     cryptography
     pytest-asyncio
-    pytestcov
     pytestCheckHook
   ];
 
+  postPatch = ''
+    substituteInPlace setup.cfg --replace "--cov=subarulink" ""
+  '';
+
   __darwinAllowLocalNetworking = true;
+
+  preCheck = ''
+    export HOME=$(mktemp -d)
+  '';
 
   pythonImportsCheck = [ "subarulink" ];
 

@@ -1,23 +1,24 @@
-{ lib, stdenv, fetchFromGitHub, rustPlatform, pkg-config, openssl, curl, Security, CoreServices, CoreFoundation, perl }:
+{ lib, stdenv, fetchFromGitHub, rustPlatform, pkg-config, openssl, curl, Security, CoreServices, CoreFoundation, libiconv }:
 
 rustPlatform.buildRustPackage rec {
   pname = "wrangler";
-  version = "1.13.0";
+  version = "1.18.0";
 
   src = fetchFromGitHub {
     owner = "cloudflare";
     repo = pname;
     rev = "v${version}";
-    sha256 = "0xhldarzb71x4k7ydk4yd6g0qv6y2l0mn2lc43hvl9jm29pnz95q";
+    sha256 = "sha256-Ue9HCAYqv8DXiEZEuGRFPywNegakxBpb66RELP1Y+cg=";
   };
 
-  cargoSha256 = "0w845virvw7mvibc76ar2hbffhfzj2v8v1xkrsssrgzyaryb48jk";
+  cargoSha256 = "sha256-HCsJG//RnlcmRSrBdf7iZTUOiQabMV2rICPLKvuE4AI=";
 
-  nativeBuildInputs = [ perl ]
-    ++ lib.optionals stdenv.isLinux [ pkg-config ];
+  nativeBuildInputs = [ pkg-config ];
 
-  buildInputs = lib.optionals stdenv.isLinux [ openssl ]
-    ++ lib.optionals stdenv.isDarwin [ curl CoreFoundation CoreServices Security ];
+  buildInputs = [ openssl ]
+    ++ lib.optionals stdenv.isDarwin [ curl CoreFoundation CoreServices Security libiconv ];
+
+  OPENSSL_NO_VENDOR = 1;
 
   # tries to use "/homeless-shelter" and fails
   doCheck = false;

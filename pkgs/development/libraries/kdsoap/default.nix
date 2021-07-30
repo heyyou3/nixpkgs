@@ -3,13 +3,9 @@
 , qtbase
 }:
 
-let
-  version = "1.9.1";
-in
-
-mkDerivation {
+mkDerivation rec {
   pname = "kdsoap";
-  inherit version;
+  version = "1.10.0";
   meta = {
     description = "A Qt-based client-side and server-side SOAP component";
     longDescription = ''
@@ -24,7 +20,7 @@ mkDerivation {
   };
   src = fetchurl {
     url = "https://github.com/KDAB/KDSoap/releases/download/kdsoap-${version}/kdsoap-${version}.tar.gz";
-    sha256 = "09rxx7h98niawz7i94g279c2rgh7xmq1hqxwlyzwsaqsx4kfl850";
+    sha256 = "sha256-DGBuzENEZtutsoKYIMoWOvYMx8oib1U7XUAyGWc3M48=";
   };
   outputs = [ "out" "dev" ];
   nativeBuildInputs = [ cmake ];

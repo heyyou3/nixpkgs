@@ -16,7 +16,7 @@ top-level attribute to `top-level/all-packages.nix`.
 
 {
   newScope,
-  lib, stdenv, fetchurl, fetchpatch, fetchFromGitHub, makeSetupHook, makeWrapper,
+  lib, stdenv, fetchurl, fetchpatch, fetchgit, fetchFromGitHub, makeSetupHook, makeWrapper,
   bison, cups ? null, harfbuzz, libGL, perl,
   gstreamer, gst-plugins-base, gtk3, dconf,
   llvmPackages_5,
@@ -48,6 +48,38 @@ let
       };
       version = "5.212.0-alpha4";
     };
+
+    qtwebengine =
+      let
+        branchName = "5.15.5";
+        rev = "v${branchName}-lts";
+      in
+      {
+        version = "${branchName}-${lib.substring 0 7 rev}";
+
+        src = fetchgit {
+          url = "https://github.com/qt/qtwebengine.git";
+          sha256 = "12wf30d34sgn82mbz91xybxyn3j1mhvxda452cfkxm232n1f2kjb";
+          inherit rev branchName;
+          fetchSubmodules = true;
+          leaveDotGit = true;
+          name = "qtwebengine-${substring 0 7 rev}.tar.gz";
+          postFetch = ''
+            # remove submodule .git directory
+            rm -rf $out/src/3rdparty/.git
+
+            # compress to not exceed the 2GB output limit
+            mv $out source
+            # try to make a deterministic tarball
+            tar -I 'gzip -n' \
+              --sort name \
+              --mtime 1970-01-01 \
+              --owner=root --group=root \
+              --numeric-owner --mode=go=rX,u+rw,a-s \
+              -cf $out source
+          '';
+        };
+      };
   };
 
   patches = {
@@ -79,20 +111,36 @@ let
         ./qtbase.patch.d/0009-qtbase-qtpluginpath.patch
         ./qtbase.patch.d/0010-qtbase-assert.patch
         ./qtbase.patch.d/0011-fix-header_module.patch
+        (fetchpatch { # This can be removed when https://codereview.qt-project.org/c/qt/qtbase/+/339323 is included in an release.
+          name = "0014-gcc11-compat.patch";
+          url = "https://codereview.qt-project.org/gitweb?p=qt/qtbase.git;a=patch;h=049e14870c13235cd066758f29c42dc96c1ccdf8";
+          sha256 = "1cb2hwi859hds0fa2cbap014qaa7mah9p0rcxcm2cvj2ybl33qfc";
+        })
       ];
     qtdeclarative = [ ./qtdeclarative.patch ];
     qtscript = [ ./qtscript.patch ];
     qtserialport = [ ./qtserialport.patch ];
-    qtwebengine = [ ]
-      ++ optionals stdenv.isDarwin [
-        ./qtwebengine-darwin-no-platform-check.patch
-        ./qtwebengine-mac-dont-set-dsymutil-path.patch
-      ];
+    qtwebengine = [
+      # Fix invisible fonts with glibc 2.33: https://github.com/NixOS/nixpkgs/issues/131074
+      (fetchpatch {
+        url = "https://src.fedoraproject.org/rpms/qt5-qtwebengine/raw/d122c011631137b79455850c363676c655cf9e09/f/qtwebengine-everywhere-src-5.15.5-%231904652.patch";
+        name = "qtwebengine-everywhere-src-5.15.5-_1904652.patch";
+        sha256 = "01q7hagq0ysii1jnrh5adm97vdm9cis592xr6im7accyw6hgcn7b";
+      })
+    ] ++ optionals stdenv.isDarwin [
+      ./qtwebengine-darwin-no-platform-check.patch
+      ./qtwebengine-mac-dont-set-dsymutil-path.patch
+    ];
     qtwebkit = [
       (fetchpatch {
         name = "qtwebkit-bison-3.7-build.patch";
         url = "https://github.com/qtwebkit/qtwebkit/commit/d92b11fea65364fefa700249bd3340e0cd4c5b31.patch";
         sha256 = "0h8ymfnwgkjkwaankr3iifiscsvngqpwb91yygndx344qdiw9y0n";
+      })
+      (fetchpatch {
+        name = "qtwebkit-glib-2.68.patch";
+        url = "https://github.com/qtwebkit/qtwebkit/pull/1058/commits/5b698ba3faffd4e198a45be9fe74f53307395e4b.patch";
+        sha256 = "0a3xv0h4lv8wggckgy8cg8xnpkg7n9h45312pdjdnnwy87xvzss0";
       })
       ./qtwebkit.patch
       ./qtwebkit-icu68.patch
@@ -140,6 +188,7 @@ let
       qtconnectivity = callPackage ../modules/qtconnectivity.nix {};
       qtdeclarative = callPackage ../modules/qtdeclarative.nix {};
       qtdoc = callPackage ../modules/qtdoc.nix {};
+      qtgamepad = callPackage ../modules/qtgamepad.nix {};
       qtgraphicaleffects = callPackage ../modules/qtgraphicaleffects.nix {};
       qtimageformats = callPackage ../modules/qtimageformats.nix {};
       qtlocation = callPackage ../modules/qtlocation.nix {};
@@ -162,7 +211,9 @@ let
       qtvirtualkeyboard = callPackage ../modules/qtvirtualkeyboard.nix {};
       qtwayland = callPackage ../modules/qtwayland.nix {};
       qtwebchannel = callPackage ../modules/qtwebchannel.nix {};
-      qtwebengine = callPackage ../modules/qtwebengine.nix {};
+      qtwebengine = callPackage ../modules/qtwebengine.nix {
+        inherit (srcs.qtwebengine) version;
+      };
       qtwebglplugin = callPackage ../modules/qtwebglplugin.nix {};
       qtwebkit = callPackage ../modules/qtwebkit.nix {};
       qtwebsockets = callPackage ../modules/qtwebsockets.nix {};

@@ -8,12 +8,12 @@
 
 let
   executableName = "element-desktop";
-  version = "1.7.22";
+  version = "1.7.33";
   src = fetchFromGitHub {
     owner = "vector-im";
     repo = "element-desktop";
     rev = "v${version}";
-    sha256 = "152ggkkk997pg3xdcdzn3samv3vsb6qifgkyl82bnwchy8y3611d";
+    sha256 = "sha256-1JmuKyJt6Q80lLXXrFw+h6/0JzWcr0qMIU9mTO+K56I=";
   };
 in mkYarnPackage rec {
   name = "element-desktop-${version}";
@@ -24,6 +24,17 @@ in mkYarnPackage rec {
 
   nativeBuildInputs = [ makeWrapper ];
 
+  buildPhase = ''
+    runHook preBuild
+    export HOME=$(mktemp -d)
+    pushd deps/element-desktop/
+    npx tsc
+    yarn run i18n
+    node ./scripts/copy-res.js
+    popd
+    runHook postBuild
+  '';
+
   installPhase = ''
     # resources
     mkdir -p "$out/share/element"
@@ -32,6 +43,7 @@ in mkYarnPackage rec {
     cp -r './deps/element-desktop/res/img' "$out/share/element"
     rm "$out/share/element/electron/node_modules"
     cp -r './node_modules' "$out/share/element/electron"
+    cp $out/share/element/electron/lib/i18n/strings/en_EN.json $out/share/element/electron/lib/i18n/strings/en-us.json
 
     # icons
     for icon in $out/share/element/electron/build/icons/*.png; do
@@ -73,6 +85,7 @@ in mkYarnPackage rec {
   meta = with lib; {
     description = "A feature-rich client for Matrix.org";
     homepage = "https://element.io/";
+    changelog = "https://github.com/vector-im/element-desktop/blob/v${version}/CHANGELOG.md";
     license = licenses.asl20;
     maintainers = teams.matrix.members;
     inherit (electron.meta) platforms;

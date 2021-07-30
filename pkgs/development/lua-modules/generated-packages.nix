@@ -693,11 +693,11 @@ lua-messagepack = buildLuarocksPackage {
 };
 lua-resty-http = buildLuarocksPackage {
   pname = "lua-resty-http";
-  version = "0.15-0";
+  version = "0.16.1-0";
 
   src = fetchurl {
-    url    = mirror://luarocks/lua-resty-http-0.15-0.src.rock;
-    sha256 = "1121abcz9y8kis2wdg7i1m75y8lplk3k49v02y804bywbl2km4fz";
+    url    = "mirror://luarocks/lua-resty-http-0.16.1-0.src.rock";
+    sha256 = "0n5hiablpc0dsccs6h76zg81wc3jb4mdvyfn9lfxnhls3yqwrgkj";
   };
   disabled = (luaOlder "5.1");
   propagatedBuildInputs = [ lua ];
@@ -705,33 +705,35 @@ lua-resty-http = buildLuarocksPackage {
   meta = with lib; {
     homepage = "https://github.com/ledgetech/lua-resty-http";
     description = "Lua HTTP client cosocket driver for OpenResty / ngx_lua.";
+    maintainers = with maintainers; [ bbigras ];
     license.fullName = "2-clause BSD";
   };
 };
 lua-resty-jwt = buildLuarocksPackage {
   pname = "lua-resty-jwt";
-  version = "0.2.2-0";
+  version = "0.2.3-0";
 
   src = fetchurl {
-    url    = mirror://luarocks/lua-resty-jwt-0.2.2-0.src.rock;
-    sha256 = "1a4wwiwcjwgr59g2940a2h0i6n1c7xjy2px5bls3x5br4shwhswa";
+    url    = "mirror://luarocks/lua-resty-jwt-0.2.3-0.src.rock";
+    sha256 = "0s7ghldwrjnhyc205pvcvgdzrgg46qz42v449vrri0cysh8ad91y";
   };
   disabled = (luaOlder "5.1");
-  propagatedBuildInputs = [ lua ];
+  propagatedBuildInputs = [ lua lua-resty-openssl ];
 
   meta = with lib; {
     homepage = "https://github.com/cdbattags/lua-resty-jwt";
     description = "JWT for ngx_lua and LuaJIT.";
+    maintainers = with maintainers; [ bbigras ];
     license.fullName = "Apache License Version 2";
   };
 };
 lua-resty-openidc = buildLuarocksPackage {
   pname = "lua-resty-openidc";
-  version = "1.7.2-1";
+  version = "1.7.4-1";
 
   src = fetchurl {
-    url    = mirror://luarocks/lua-resty-openidc-1.7.2-1.src.rock;
-    sha256 = "01mya69r4fncfrpqh5pn2acg18q3slds8zm976qgkjby0pzwzzw7";
+    url    = "mirror://luarocks/lua-resty-openidc-1.7.4-1.src.rock";
+    sha256 = "07ny9rl8zir1c3plrbdmd2a23ysrx45qam196nhqsz118xrbds78";
   };
   disabled = (luaOlder "5.1");
   propagatedBuildInputs = [ lua lua-resty-http lua-resty-session lua-resty-jwt ];
@@ -739,16 +741,33 @@ lua-resty-openidc = buildLuarocksPackage {
   meta = with lib; {
     homepage = "https://github.com/zmartzone/lua-resty-openidc";
     description = "A library for NGINX implementing the OpenID Connect Relying Party (RP) and the OAuth 2.0 Resource Server (RS) functionality";
+    maintainers = with maintainers; [ bbigras ];
     license.fullName = "Apache 2.0";
+  };
+};
+lua-resty-openssl = buildLuarocksPackage {
+  pname = "lua-resty-openssl";
+  version = "0.7.2-1";
+
+  src = fetchurl {
+    url    = "mirror://luarocks/lua-resty-openssl-0.7.2-1.src.rock";
+    sha256 = "00z6adib31ax4givq4zrhbfxa6l99l2hhlxnjpb6rfl4gf8h82kq";
+  };
+
+  meta = with lib; {
+    homepage = "https://github.com/fffonion/lua-resty-openssl";
+    description = "No summary";
+    maintainers = with maintainers; [ bbigras ];
+    license.fullName = "BSD";
   };
 };
 lua-resty-session = buildLuarocksPackage {
   pname = "lua-resty-session";
-  version = "3.6-1";
+  version = "3.8-1";
 
   src = fetchurl {
-    url    = mirror://luarocks/lua-resty-session-3.6-1.src.rock;
-    sha256 = "1r5626x247d1vi5bzqfk11bl4d5c39h1iqj6mgndnwpnz43cag5i";
+    url    = "mirror://luarocks/lua-resty-session-3.8-1.src.rock";
+    sha256 = "1x4l6n0dnm4br4p376r8nkg53hwm6a48xkhrzhsh9fcd5xqgqvxz";
   };
   disabled = (luaOlder "5.1");
   propagatedBuildInputs = [ lua ];
@@ -756,6 +775,7 @@ lua-resty-session = buildLuarocksPackage {
   meta = with lib; {
     homepage = "https://github.com/bungle/lua-resty-session";
     description = "Session Library for OpenResty – Flexible and Secure";
+    maintainers = with maintainers; [ bbigras ];
     license.fullName = "BSD";
   };
 };
@@ -1456,6 +1476,36 @@ penlight = buildLuarocksPackage {
     homepage = "http://tieske.github.io/Penlight";
     description = "Lua utility libraries loosely based on the Python standard libraries";
     maintainers = with maintainers; [ alerque ];
+    license.fullName = "MIT/X11";
+  };
+};
+plenary-nvim = buildLuarocksPackage {
+  pname = "plenary.nvim";
+  version = "scm-1";
+
+  knownRockspec = (fetchurl {
+    url    = "mirror://luarocks/plenary.nvim-scm-1.rockspec";
+    sha256 = "1cp2dzf3010q85h300aa7zphyz75qn67lrwf9v6b0p534nzvmash";
+  }).outPath;
+
+  src = fetchgit ( removeAttrs (builtins.fromJSON ''{
+  "url": "git://github.com/nvim-lua/plenary.nvim",
+  "rev": "8bae2c1fadc9ed5bfcfb5ecbd0c0c4d7d40cb974",
+  "date": "2021-07-12T11:07:18-04:00",
+  "path": "/nix/store/djp9yacizsxs9hiz786fb900fri0m2l8-plenary.nvim",
+  "sha256": "1axvjv6n77afkjqk914dpc020kxd7mig6m5sr916k1n1q35jc4ny",
+  "fetchSubmodules": true,
+  "deepClone": false,
+  "leaveDotGit": false
+}
+ '') ["date" "path"]) ;
+
+  disabled = (luaOlder "5.1") || (luaAtLeast "5.4");
+  propagatedBuildInputs = [ lua luassert ];
+
+  meta = with lib; {
+    homepage = "http://github.com/nvim-lua/plenary.nvim";
+    description = "lua functions you don't want to write ";
     license.fullName = "MIT/X11";
   };
 };

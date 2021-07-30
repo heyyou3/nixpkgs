@@ -1,15 +1,31 @@
-{ lib, python3, fetchPypi, appdirs, attrs, requests,
-beautifulsoup4, click-plugins, elasticsearch, flask_login, flask_wtf,
-pypandoc, python-dotenv, python-frontmatter, tinydb, validators,
-watchdog, wtforms, html2text, flask-compress }:
+{ lib
+, buildPythonApplication
+, fetchPypi
+, appdirs
+, attrs
+, beautifulsoup4
+, click-plugins
+, elasticsearch
+, flask-compress
+, flask_login
+, flask_wtf
+, html2text
+, python-dotenv
+, python-frontmatter
+, requests
+, tinydb
+, validators
+, werkzeug
+, wtforms
+}:
 
-python3.pkgs.buildPythonApplication rec {
+buildPythonApplication rec {
   pname = "archivy";
-  version = "1.0.2";
+  version = "1.4.0";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "6f706b925175852d8101a4afe2304ab7ee7d56e9658538b9a8e49e925978b87e";
+    sha256 = "sha256-wQuR7cltDLr2u8BQ851MSjKmeLW8mQ/3bdEF5c9nxL0=";
   };
 
   # Relax some dependencies
@@ -22,6 +38,10 @@ python3.pkgs.buildPythonApplication rec {
       --replace 'python_frontmatter == 0.5.0' 'python_frontmatter' \
       --replace 'requests ==' 'requests >=' \
       --replace 'validators ==' 'validators >=' \
+      --replace 'tinydb ==' 'tinydb >=' \
+      --replace 'Flask_WTF == 0.14.3' 'Flask_WTF' \
+      --replace 'Werkzeug ==' 'Werkzeug >=' \
+      --replace 'Flask ==' 'Flask >='
   '';
 
   propagatedBuildInputs = [
@@ -30,18 +50,17 @@ python3.pkgs.buildPythonApplication rec {
     beautifulsoup4
     click-plugins
     elasticsearch
+    flask-compress
     flask_login
     flask_wtf
-    pypandoc
+    html2text
     python-dotenv
     python-frontmatter
-    tinydb
     requests
+    tinydb
     validators
-    watchdog
+    werkzeug
     wtforms
-    html2text
-    flask-compress
   ];
 
   # __init__.py attempts to mkdir in read-only file system

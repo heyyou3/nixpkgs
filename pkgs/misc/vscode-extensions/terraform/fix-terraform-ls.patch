@@ -1,26 +1,43 @@
+diff --git a/out/clientHandler.js b/out/clientHandler.js
+index 7f9716d..a543d60 100644
+--- a/out/clientHandler.js
++++ b/out/clientHandler.js
+@@ -33,8 +33,7 @@ class ClientHandler {
+             this.reporter.sendTelemetryEvent('usePathToBinary');
+         }
+         else {
+-            const installPath = path.join(context.extensionPath, 'lsp');
+-            this.pathToBinary = path.join(installPath, 'terraform-ls');
++            this.pathToBinary = 'TERRAFORM-LS-PATH';
+         }
+     }
+     startClients(folders) {
 diff --git a/out/extension.js b/out/extension.js
-index 375048c..fa5eff0 100644
+index 7a271fc..726bbf8 100644
 --- a/out/extension.js
 +++ b/out/extension.js
-@@ -209,20 +209,7 @@ function pathToBinary() {
-         if (!_pathToBinaryPromise) {
-             let command = vscodeUtils_1.config('terraform').get('languageServer.pathToBinary');
-             if (!command) { // Skip install/upgrade if user has set custom binary path
--                const installDir = `${extensionPath}/lsp`;
--                const installer = new languageServerInstaller_1.LanguageServerInstaller();
+@@ -149,24 +149,6 @@ function updateLanguageServer(clientHandler, installPath) {
+             updateLanguageServer(clientHandler, installPath);
+         }, 24 * hour);
+         // skip install if a language server binary path is set
+-        if (!vscodeUtils_1.config('terraform').get('languageServer.pathToBinary')) {
+-            const installer = new languageServerInstaller_1.LanguageServerInstaller(installPath, reporter);
+-            const install = yield installer.needsInstall();
+-            if (install) {
+-                yield clientHandler.stopClients();
 -                try {
--                    yield installer.install(installDir);
+-                    yield installer.install();
 -                }
 -                catch (err) {
--                    vscode.window.showErrorMessage(err);
+-                    console.log(err); // for test failure reporting
 -                    reporter.sendTelemetryException(err);
 -                    throw err;
 -                }
 -                finally {
--                    yield installer.cleanupZips(installDir);
+-                    yield installer.cleanupZips();
 -                }
--                command = `${installDir}/terraform-ls`;
-+                command = 'TERRAFORM-LS-PATH';
-             }
-             _pathToBinaryPromise = Promise.resolve(command);
-         }
+-            }
+-        }
+         return clientHandler.startClients(vscodeUtils_1.prunedFolderNames()); // on repeat runs with no install, this will be a no-op
+     });
+ }

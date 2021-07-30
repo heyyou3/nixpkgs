@@ -1,17 +1,17 @@
 { lib, stdenv, fetchurl, pkg-config, gnutls, liburcu, lmdb, libcap_ng, libidn2, libunistring
 , systemd, nettle, libedit, zlib, libiconv, libintl, libmaxminddb, libbpf, nghttp2
-, autoreconfHook
+, autoreconfHook, nixosTests
 }:
 
 let inherit (lib) optional optionals; in
 
 stdenv.mkDerivation rec {
   pname = "knot-dns";
-  version = "3.0.4";
+  version = "3.0.8";
 
   src = fetchurl {
     url = "https://secure.nic.cz/files/knot-dns/knot-${version}.tar.xz";
-    sha256 = "451d8913a769b7e4bcb3e250a3181b448e28a82cfc58cea6f2509475d7327983";
+    sha256 = "df723949c19ebecf9a7118894c3127e292eb09dc7274b5ce9b527409f42edfb0";
   };
 
   outputs = [ "bin" "out" "dev" ];
@@ -50,11 +50,14 @@ stdenv.mkDerivation rec {
   CFLAGS = [ "-O2" "-DNDEBUG" ];
 
   doCheck = true;
+  checkFlags = "V=1"; # verbose output in case some test fails
   doInstallCheck = true;
 
   postInstall = ''
     rm -r "$out"/lib/*.la
   '';
+
+  passthru.tests = { inherit (nixosTests) knot; };
 
   meta = with lib; {
     description = "Authoritative-only DNS server from .cz domain registry";

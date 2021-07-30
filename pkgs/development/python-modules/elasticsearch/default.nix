@@ -7,11 +7,11 @@
 
 buildPythonPackage (rec {
   pname = "elasticsearch";
-  version = "7.10.1";
+  version = "7.13.1";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "a725dd923d349ca0652cf95d6ce23d952e2153740cf4ab6daf4a2d804feeed48";
+    sha256 = "d6bcca0b2e5665d08e6fe6fadc2d4d321affd76ce483603078fc9d3ccd2bc0f9";
   };
 
   # Check is disabled because running them destroy the content of the local cluster!

@@ -1,6 +1,6 @@
 { channel, pname, version, build ? null, sha256Hash }:
 
-{ alsaLib
+{ alsa-lib
 , bash
 , buildFHSUserEnv
 , cacert
@@ -65,9 +65,9 @@ let
       sha256 = sha256Hash;
     };
 
+    nativeBuildInputs = [ unzip ];
     buildInputs = [
       makeWrapper
-      unzip
     ];
     installPhase = ''
       cp -r . $out
@@ -121,7 +121,7 @@ let
           libXrandr
 
           # For Android emulator
-          alsaLib
+          alsa-lib
           dbus
           expat
           libpulseaudio
@@ -145,7 +145,7 @@ let
         ]}"
 
       # AS launches LLDBFrontend with a custom LD_LIBRARY_PATH
-      wrapProgram $out/bin/lldb/bin/LLDBFrontend --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [
+      wrapProgram $(find $out -name LLDBFrontend) --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [
         ncurses5
         zlib
       ]}"
