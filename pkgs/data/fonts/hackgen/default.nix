@@ -1,4 +1,4 @@
-{ stdenv, fetchzip }:
+{ lib, fetchzip }:
 
 let
   version = "v2.3.1";
@@ -9,12 +9,19 @@ in fetchzip {
 
   postFetch = ''
     mkdir -p $out/share/fonts
-    unzip -j $downloadedFile \*.ttf -d $out/share/fonts/truetype
+    unzip -j $downloadedFile \*.ttf -d $out/share/fonts/hackgen
   '';
 
-  sha256 = "c4edeeb41882bebee179e593f929418706118c7dcd068672ded2ca99e6991ff7";
+  sha256 = "0a1vp6v18yj5lspxk4n7l1r6ipabmpdwgjflg9alhs3gdwbg952c";
 
-  meta = with stdenv.lib {
-    description = "programming font";
+  meta = with lib; {
+    description = "A typeface designed for source code";
+    longDescription = ''
+    '';
+    homepage = "";
+
+    license = licenses.free;
+    maintainers = with maintainers; [ dywedir ];
+    platforms = platforms.all;
   };
 }
