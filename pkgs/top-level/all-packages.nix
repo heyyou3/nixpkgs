@@ -22572,6 +22572,8 @@ with pkgs;
 
   camingo-code = callPackage ../data/fonts/camingo-code { };
 
+  cica = callPackage ../data/fonts/cica { };
+
   combinatorial_designs = callPackage ../data/misc/combinatorial_designs { };
 
   conway_polynomials = callPackage ../data/misc/conway_polynomials { };
