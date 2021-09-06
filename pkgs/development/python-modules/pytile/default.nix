@@ -8,24 +8,25 @@
 , pytest-aiohttp
 , pytest-asyncio
 , pytestCheckHook
-, pythonAtLeast
+, pythonOlder
 }:
 
 buildPythonPackage rec {
   pname = "pytile";
-  version = "5.1.1";
-  disabled = pythonAtLeast "3.9";
+  version = "5.2.3";
+  format = "pyproject";
+  disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "bachya";
     repo = pname;
     rev = version;
-    sha256 = "sha256-bVoFTaK/Alemtc5I+Z/M9y/FWczvJ+P86R0DMD89/BM=";
+    sha256 = "01gxq6dbqjmsqndjcbqv79wd2wgs7krm0rn47k883gh2xg9sn606";
   };
 
-  format = "pyproject";
-
-  nativeBuildInputs = [ poetry-core ];
+  nativeBuildInputs = [
+    poetry-core
+  ];
 
   propagatedBuildInputs = [
     aiohttp
@@ -39,8 +40,11 @@ buildPythonPackage rec {
     pytestCheckHook
   ];
 
-  # Ignore the examples as they are prefixed with test_
-  pytestFlagsArray = [ "--ignore examples/" ];
+  disabledTestPaths = [
+    # Ignore the examples as they are prefixed with test_
+    "examples/"
+  ];
+
   pythonImportsCheck = [ "pytile" ];
 
   __darwinAllowLocalNetworking = true;

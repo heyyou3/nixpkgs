@@ -2,14 +2,14 @@
 
 buildGoModule rec {
   pname = "age";
-  version = "1.0.0-beta6";
-  vendorSha256 = "sha256-FTByNpLkWWHAWe5wVDRBGtKap/5+XGHeBMQAIdlPCkA=";
+  version = "1.0.0-rc.3";
+  vendorSha256 = "sha256-sXUbfxhPmJXO+KgV/dmWmsyV49Pb6CoJLbt50yVgEvI=";
 
   src = fetchFromGitHub {
     owner = "FiloSottile";
     repo = "age";
     rev = "v${version}";
-    sha256 = "sha256-1LCcCEf2/R0am0jpA8yKl44+AoUFkbepxp9V6/nZkBQ=";
+    sha256 = "sha256-YXdCTK9/eMvcHWg7gQQiPlLWYx2OjbOJDDNdSYO09HU=";
   };
 
   meta = with lib; {

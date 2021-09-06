@@ -1,17 +1,16 @@
 { lib, stdenv, fetchurl, pkg-config, gnutls, liburcu, lmdb, libcap_ng, libidn2, libunistring
-, systemd, nettle, libedit, zlib, libiconv, libintl, libmaxminddb, libbpf, nghttp2
-, autoreconfHook
+, systemd, nettle, libedit, zlib, libiconv, libintl, libmaxminddb, libbpf, nghttp2, libmnl
+, autoreconfHook, nixosTests
+, fetchpatch
 }:
-
-let inherit (lib) optional optionals; in
 
 stdenv.mkDerivation rec {
   pname = "knot-dns";
-  version = "3.0.4";
+  version = "3.1.1";
 
   src = fetchurl {
     url = "https://secure.nic.cz/files/knot-dns/knot-${version}.tar.xz";
-    sha256 = "451d8913a769b7e4bcb3e250a3181b448e28a82cfc58cea6f2509475d7327983";
+    sha256 = "75bfb1acaca774ed3dd781dc74780298dc0fd51b54e4b61015e7487d6cd2067c";
   };
 
   outputs = [ "bin" "out" "dev" ];
@@ -27,6 +26,11 @@ stdenv.mkDerivation rec {
     # They are later created from NixOS itself.
     ./dont-create-run-time-dirs.patch
     ./runtime-deps.patch
+    # rename task_t to worker_task_t to fix redefinition issues on (aach64-)darwin
+    (fetchpatch {
+      url = "https://gitlab.nic.cz/knot/knot-dns/-/commit/a70b718085f9b97e556970444313c37a702a60f7.diff";
+      sha256 = "0m776pb9iga0lj2gadk23shfrcfrsrzlyaj8800klw7xh6qq32bm";
+    })
   ];
 
   nativeBuildInputs = [ pkg-config autoreconfHook ];
@@ -38,23 +42,24 @@ stdenv.mkDerivation rec {
     libmaxminddb # optional for geoip module (it's tiny)
     # without sphinx &al. for developer documentation
     # TODO: add dnstap support?
-  ]
-    ++ optionals stdenv.isLinux [
-      libcap_ng systemd
-      libbpf # XDP support
-    ]
-    ++ optional stdenv.isDarwin zlib; # perhaps due to gnutls
+  ] ++ lib.optionals stdenv.isLinux [
+    libcap_ng systemd
+    libbpf libmnl # XDP support (it's Linux kernel API)
+  ] ++ lib.optional stdenv.isDarwin zlib; # perhaps due to gnutls
 
   enableParallelBuilding = true;
 
   CFLAGS = [ "-O2" "-DNDEBUG" ];
 
   doCheck = true;
+  checkFlags = "V=1"; # verbose output in case some test fails
   doInstallCheck = true;
 
   postInstall = ''
     rm -r "$out"/lib/*.la
   '';
+
+  passthru.tests = { inherit (nixosTests) knot; };
 
   meta = with lib; {
     description = "Authoritative-only DNS server from .cz domain registry";
