@@ -12,7 +12,7 @@ in fetchzip {
     unzip -j $downloadedFile \*.ttf -d $out/share/fonts/firge
   '';
 
-  sha256 = "0a1vp6v18yj5lspxk4n7l1r6ipabmpdwgjflg9alhs3gdwbg952c";
+  sha256 = "0x8vqs125dsbnxggc577j82v06nxrij9i7prpaipqw7byar107di";
 
   meta = with lib; {
     description = "Fira Mono と源真ゴシックを合成したプログラミングフォントです。";
