@@ -22,7 +22,7 @@ let
         doCheck ? true,
         requireX ? false,
         broken ? false,
-        hydraPlatforms ? R.meta.hydraPlatforms
+        hydraPlatforms ? R.meta.platforms
       }: buildRPackage {
     name = "${name}-${version}";
     src = fetchurl {
@@ -43,21 +43,29 @@ let
   #
   deriveBioc = mkDerive {
     mkHomepage = {name, biocVersion, ...}: "https://bioconductor.org/packages/${biocVersion}/bioc/html/${name}.html";
-    mkUrls = {name, version, biocVersion}: [ "mirror://bioc/${biocVersion}/bioc/src/contrib/${name}_${version}.tar.gz"
-                                             "mirror://bioc/${biocVersion}/bioc/src/contrib/Archive/${name}/${name}_${version}.tar.gz"
-                                             "mirror://bioc/${biocVersion}/bioc/src/contrib/Archive/${name}_${version}.tar.gz" ];
+    mkUrls = {name, version, biocVersion}: [
+      "mirror://bioc/${biocVersion}/bioc/src/contrib/${name}_${version}.tar.gz"
+      "mirror://bioc/${biocVersion}/bioc/src/contrib/Archive/${name}/${name}_${version}.tar.gz"
+      "mirror://bioc/${biocVersion}/bioc/src/contrib/Archive/${name}_${version}.tar.gz"
+    ];
   };
   deriveBiocAnn = mkDerive {
     mkHomepage = {name, ...}: "http://www.bioconductor.org/packages/${name}.html";
-    mkUrls = {name, version, biocVersion}: [ "mirror://bioc/${biocVersion}/data/annotation/src/contrib/${name}_${version}.tar.gz" ];
+    mkUrls = {name, version, biocVersion}: [
+      "mirror://bioc/${biocVersion}/data/annotation/src/contrib/${name}_${version}.tar.gz"
+    ];
   };
   deriveBiocExp = mkDerive {
     mkHomepage = {name, ...}: "http://www.bioconductor.org/packages/${name}.html";
-    mkUrls = {name, version, biocVersion}: [ "mirror://bioc/${biocVersion}/data/experiment/src/contrib/${name}_${version}.tar.gz" ];
+    mkUrls = {name, version, biocVersion}: [
+      "mirror://bioc/${biocVersion}/data/experiment/src/contrib/${name}_${version}.tar.gz"
+    ];
   };
   deriveCran = mkDerive {
     mkHomepage = {name, snapshot, ...}: "http://mran.revolutionanalytics.com/snapshot/${snapshot}/web/packages/${name}/";
-    mkUrls = {name, version, snapshot}: [ "http://mran.revolutionanalytics.com/snapshot/${snapshot}/src/contrib/${name}_${version}.tar.gz" ];
+    mkUrls = {name, version, snapshot}: [
+      "http://mran.revolutionanalytics.com/snapshot/${snapshot}/src/contrib/${name}_${version}.tar.gz"
+    ];
   };
 
   # Overrides package definitions with nativeBuildInputs.
@@ -334,6 +342,7 @@ let
     runjags = [ pkgs.jags ];
     RVowpalWabbit = with pkgs; [ zlib.dev boost ];
     rzmq = with pkgs; [ zeromq pkg-config ];
+    httpuv = [ pkgs.zlib.dev ];
     clustermq = [ pkgs.zeromq ];
     SAVE = with pkgs; [ zlib bzip2 icu xz pcre ];
     sdcTable = with pkgs; [ gmp glpk ];
@@ -456,6 +465,19 @@ let
     mvtnorm = [ pkgs.libiconv ];
     statmod = [ pkgs.libiconv ];
     rsvg = [ pkgs.librsvg.dev ];
+    ssh = with pkgs; [ libssh ];
+    s2 = [ pkgs.openssl.dev ];
+    ArrayExpressHTS = with pkgs; [ zlib.dev curl.dev which ];
+    bbl = with pkgs; [ gsl ];
+    writexl = with pkgs; [ zlib.dev ];
+    qpdf = with pkgs; [ libjpeg.dev zlib.dev ];
+    vcfR = with pkgs; [ zlib.dev ];
+    bio3d = with pkgs; [ zlib.dev ];
+    arrangements = with pkgs; [ gmp.dev ];
+    spp = with pkgs; [ zlib.dev ];
+    Rbowtie = with pkgs; [ zlib.dev ];
+    gaston = with pkgs; [ zlib.dev ];
+    csaw = with pkgs; [ zlib.dev curl ];
   };
 
   packagesRequireingX = [
@@ -537,6 +559,7 @@ let
     "KappaGUI"
     "likeLTD"
     "logmult"
+    "loon"
     "LS2Wstat"
     "MareyMap"
     "memgene"
@@ -574,6 +597,7 @@ let
     "RandomFields"
     "rareNMtests"
     "rAverage"
+    "RclusTool"
     "Rcmdr"
     "RcmdrPlugin_coin"
     "RcmdrPlugin_depthTools"
@@ -698,15 +722,6 @@ let
       preConfigure = "patchShebangs configure";
     });
 
-    ggbio = old.ggbio.overrideDerivation (attrs: {
-      patches = [
-        (pkgs.fetchpatch {
-          url = "https://github.com/tengfei/ggbio/commit/b04a9840cf5c0bd0514db2536f2e610bbd364727.patch";
-          sha256 = "blwtObyIYo1UBWz4nlmcJ8Nyw/n0qwmJrtwFWuoUyMg=";
-        })
-      ];
-    });
-
     RcppArmadillo = old.RcppArmadillo.overrideDerivation (attrs: {
       patchPhase = "patchShebangs configure";
     });
@@ -785,7 +800,9 @@ let
     });
 
     RMySQL = old.RMySQL.overrideDerivation (attrs: {
-      MYSQL_DIR="${pkgs.libmysqlclient}";
+      MYSQL_DIR = "${pkgs.libmysqlclient}";
+      PKGCONFIG_CFLAGS = "-I${pkgs.libmysqlclient.dev}/include/mysql";
+      NIX_CFLAGS_LINK = "-L${pkgs.libmysqlclient}/lib/mysql -lmysqlclient";
       preConfigure = ''
         patchShebangs configure
       '';
@@ -964,6 +981,20 @@ let
     lpsymphony = old.lpsymphony.overrideDerivation (attrs: {
       preConfigure = ''
         patchShebangs configure
+      '';
+    });
+
+    sodium = old.sodium.overrideDerivation (attrs: with pkgs; {
+      preConfigure = ''
+        patchShebangs configure
+      '';
+      nativeBuildInputs = [ pkg-config ] ++ attrs.nativeBuildInputs;
+      buildInputs = [ libsodium.dev ] ++ attrs.buildInputs;
+    });
+
+    Rhtslib = old.Rhtslib.overrideDerivation (attrs: {
+      preConfigure = ''
+        substituteInPlace R/zzz.R --replace "-lcurl" "-L${pkgs.curl.out}/lib -lcurl"
       '';
     });
 

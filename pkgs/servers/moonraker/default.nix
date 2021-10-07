@@ -11,16 +11,17 @@ let
     inotify-simple
     libnacl
     paho-mqtt
+    pycurl
   ]);
 in stdenvNoCC.mkDerivation rec {
   pname = "moonraker";
-  version = "unstable-2021-07-18";
+  version = "unstable-2021-09-21";
 
   src = fetchFromGitHub {
     owner = "Arksine";
     repo = "moonraker";
-    rev = "42f61ceafa90fcfea8bffbe968e26a6fd8b61af6";
-    sha256 = "1w6l9pgs4n4nnk3h40y346bf6j3v4j4h1qnhj5dwlbwdxiqpd9gs";
+    rev = "2447ccab6252fddc829da3eec8b29d1abe3dee60";
+    sha256 = "qaorF26e2pkOCxiUfo8MOPQVpZjx5G1uo66jFoQpMcs=";
   };
 
   nativeBuildInputs = [ makeWrapper ];

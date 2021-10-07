@@ -16,13 +16,13 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "tts";
-  version = "0.2.1";
+  version = "0.3.1";
 
   src = fetchFromGitHub {
     owner = "coqui-ai";
     repo = "TTS";
     rev = "v${version}";
-    sha256 = "sha256-7YMNxZ15qQowEE0tE6x/LbtirNGp7h9OLyS1JSl9x2A=";
+    sha256 = "sha256-/CeetLm3jgS5Q69zTVkLm+Wh4nD7D4c6j9MTujMc3fU=";
   };
 
   postPatch = ''
@@ -55,6 +55,7 @@ python3.pkgs.buildPythonApplication rec {
     pypinyin
     pysbd
     pytorch
+    pyworld
     scipy
     soundfile
     tensorboardx
@@ -68,7 +69,7 @@ python3.pkgs.buildPythonApplication rec {
     cp -r TTS/server/templates/ $out/${python3.sitePackages}/TTS/server
     # cython modules are not installed for some reasons
     (
-      cd TTS/tts/layers/glow_tts/monotonic_align
+      cd TTS/tts/utils/monotonic_align
       ${python3.interpreter} setup.py install --prefix=$out
     )
   '';

@@ -1,22 +1,37 @@
 { lib, stdenv, python3, openssl
 , enableSystemd ? stdenv.isLinux, nixosTests
-, enableRedis ? false
+, enableRedis ? true
 , callPackage
 }:
 
-with python3.pkgs;
+let
+py = python3.override {
+  packageOverrides = self: super: {
+    frozendict = super.frozendict.overridePythonAttrs (oldAttrs: rec {
+      version = "1.2";
+      src = oldAttrs.src.override {
+        inherit version;
+        sha256 = "0ibf1wipidz57giy53dh7mh68f2hz38x8f4wdq88mvxj5pr7jhbp";
+      };
+      doCheck = false;
+    });
+  };
+};
+in
+
+with py.pkgs;
 
 let
-  plugins = python3.pkgs.callPackage ./plugins { };
+  plugins = py.pkgs.callPackage ./plugins { };
   tools = callPackage ./tools { };
 in
 buildPythonApplication rec {
   pname = "matrix-synapse";
-  version = "1.41.1";
+  version = "1.43.0";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "1vaym6mxnwg2xdqjcigi2sb0kkdi0ly5d5ghakfsysxcfn08d1z8";
+    sha256 = "sha256-t3ZXtEq/sHYymta4gYfmdBzpExyxepGQ4lzvZii2Q70=";
   };
 
   patches = [
@@ -66,13 +81,13 @@ buildPythonApplication rec {
   doCheck = !stdenv.isDarwin;
 
   checkPhase = ''
-    PYTHONPATH=".:$PYTHONPATH" ${python3.interpreter} -m twisted.trial tests
+    PYTHONPATH=".:$PYTHONPATH" ${py.interpreter} -m twisted.trial -j $NIX_BUILD_CORES tests
   '';
 
   passthru.tests = { inherit (nixosTests) matrix-synapse; };
   passthru.plugins = plugins;
   passthru.tools = tools;
-  passthru.python = python3;
+  passthru.python = py;
 
   meta = with lib; {
     homepage = "https://matrix.org";

@@ -353,7 +353,7 @@ in {
           };
         });
         default = [];
-        example = literalExample ''
+        example = literalExpression ''
         [ {
               source = pkgs.writeText "upHook" '''
 
@@ -464,6 +464,7 @@ in {
     users.users = {
       nm-openvpn = {
         uid = config.ids.uids.nm-openvpn;
+        group = "nm-openvpn";
         extraGroups = [ "networkmanager" ];
       };
       nm-iodine = {

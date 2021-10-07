@@ -1,28 +1,29 @@
 { lib, buildGoModule, fetchFromGitHub, fetchzip, installShellFiles }:
 
 let
-  version = "0.17.0";
+  version = "0.17.2";
+  sha256 = "0kcdx4ldnshk4pqq37a7p08xr5cpsjrbrifk9fc3jbiw39m09mhf";
+  manifestsSha256 = "1v6md4xh4sq1vmb5a8qvb66l101fq75lmv2s4j2z3walssb5mmgj";
 
   manifests = fetchzip {
     url = "https://github.com/fluxcd/flux2/releases/download/v${version}/manifests.tar.gz";
-    sha256 = "15ffb8damn935sfnqpshiyaazpldjcq411xrcfngpp7ncl9vbgwm";
+    sha256 = manifestsSha256;
     stripRoot = false;
   };
 in
 
 buildGoModule rec {
-  inherit version;
-
   pname = "fluxcd";
+  inherit version;
 
   src = fetchFromGitHub {
     owner = "fluxcd";
     repo = "flux2";
     rev = "v${version}";
-    sha256 = "1pw558d64c6ynqnnadhg8vbi4ql6f5y81l9hpxi0ki5myj2kx6an";
+    inherit sha256;
   };
 
-  vendorSha256 = "sha256-FUASe7EQ8YVv3R6fPPLtsvMibe00Ox596GoTyKt0S+E=";
+  vendorSha256 = "sha256-glifJ0V3RwS7E6EWZsCa88m0MK883RhPSXCsAmMggVs=";
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -49,6 +50,8 @@ buildGoModule rec {
       installShellCompletion flux.$shell
     done
   '';
+
+  passthru.updateScript = ./update.sh;
 
   meta = with lib; {
     description = "Open and extensible continuous delivery solution for Kubernetes";

@@ -586,7 +586,7 @@ in
     };
 
     security.pam.services = mkOption {
-      default = [];
+      default = {};
       type = with types; attrsOf (submodule pamOpts);
       description =
         ''
@@ -869,9 +869,10 @@ in
 
     security.wrappers = {
       unix_chkpwd = {
-        source = "${pkgs.pam}/sbin/unix_chkpwd.orig";
-        owner = "root";
         setuid = true;
+        owner = "root";
+        group = "root";
+        source = "${pkgs.pam}/sbin/unix_chkpwd.orig";
       };
     };
 

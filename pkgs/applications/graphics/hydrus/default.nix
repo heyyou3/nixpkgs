@@ -10,14 +10,14 @@
 
 python3Packages.buildPythonPackage rec {
   pname = "hydrus";
-  version = "452";
+  version = "456";
   format = "other";
 
   src = fetchFromGitHub {
     owner = "hydrusnetwork";
     repo = "hydrus";
     rev = "v${version}";
-    sha256 = "1zzrw1fbbbayq322346dqb3a8bzb3xnx1qmdciq01dmlbc3bmza1";
+    sha256 = "sha256-r5EeHWqhJQMvImxB7IVV8MAoW8qIVYpuSN1uOYCTlHY=";
   };
 
   nativeBuildInputs = [
@@ -71,6 +71,7 @@ python3Packages.buildPythonPackage rec {
     -e TestClientThreading \
     -e TestDialogs \
     -e TestFunctions \
+    -e TestHydrusNetwork \
     -e TestHydrusNATPunch \
     -e TestHydrusSerialisable \
     -e TestHydrusServer \

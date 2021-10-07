@@ -31,7 +31,7 @@ let
       linuxPackages_4_19
       linuxPackages_5_4
       linuxPackages_5_10
-      linuxPackages_5_13
+      linuxPackages_5_14
 
       linuxPackages_4_14_hardened
       linuxPackages_4_19_hardened

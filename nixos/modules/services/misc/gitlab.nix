@@ -239,36 +239,36 @@ in {
       packages.gitlab = mkOption {
         type = types.package;
         default = pkgs.gitlab;
-        defaultText = "pkgs.gitlab";
+        defaultText = literalExpression "pkgs.gitlab";
         description = "Reference to the gitlab package";
-        example = "pkgs.gitlab-ee";
+        example = literalExpression "pkgs.gitlab-ee";
       };
 
       packages.gitlab-shell = mkOption {
         type = types.package;
         default = pkgs.gitlab-shell;
-        defaultText = "pkgs.gitlab-shell";
+        defaultText = literalExpression "pkgs.gitlab-shell";
         description = "Reference to the gitlab-shell package";
       };
 
       packages.gitlab-workhorse = mkOption {
         type = types.package;
         default = pkgs.gitlab-workhorse;
-        defaultText = "pkgs.gitlab-workhorse";
+        defaultText = literalExpression "pkgs.gitlab-workhorse";
         description = "Reference to the gitlab-workhorse package";
       };
 
       packages.gitaly = mkOption {
         type = types.package;
         default = pkgs.gitaly;
-        defaultText = "pkgs.gitaly";
+        defaultText = literalExpression "pkgs.gitaly";
         description = "Reference to the gitaly package";
       };
 
       packages.pages = mkOption {
         type = types.package;
         default = pkgs.gitlab-pages;
-        defaultText = "pkgs.gitlab-pages";
+        defaultText = literalExpression "pkgs.gitlab-pages";
         description = "Reference to the gitlab-pages package";
       };
 
@@ -356,7 +356,7 @@ in {
       backup.uploadOptions = mkOption {
         type = types.attrs;
         default = {};
-        example = literalExample ''
+        example = literalExpression ''
           {
             # Fog storage connection settings, see http://fog.io/storage/
             connection = {
@@ -543,12 +543,10 @@ in {
         };
         certFile = mkOption {
           type = types.path;
-          default = null;
           description = "Path to GitLab container registry certificate.";
         };
         keyFile = mkOption {
           type = types.path;
-          default = null;
           description = "Path to GitLab container registry certificate-key.";
         };
         defaultForProjects = mkOption {
@@ -821,10 +819,44 @@ in {
         '';
       };
 
+      logrotate = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+          description = ''
+            Enable rotation of log files.
+          '';
+        };
+
+        frequency = mkOption {
+          type = types.str;
+          default = "daily";
+          description = "How often to rotate the logs.";
+        };
+
+        keep = mkOption {
+          type = types.int;
+          default = 30;
+          description = "How many rotations to keep.";
+        };
+
+        extraConfig = mkOption {
+          type = types.lines;
+          default = ''
+            copytruncate
+            compress
+          '';
+          description = ''
+            Extra logrotate config options for this path. Refer to
+            <link xlink:href="https://linux.die.net/man/8/logrotate"/> for details.
+          '';
+        };
+      };
+
       extraConfig = mkOption {
         type = types.attrs;
         default = {};
-        example = literalExample ''
+        example = literalExpression ''
           {
             gitlab = {
               default_projects_features = {
@@ -930,6 +962,21 @@ in {
     services.postgresql = optionalAttrs databaseActuallyCreateLocally {
       enable = true;
       ensureUsers = singleton { name = cfg.databaseUsername; };
+    };
+
+    # Enable rotation of log files
+    services.logrotate = {
+      enable = cfg.logrotate.enable;
+      paths = {
+        gitlab = {
+          path = "${cfg.statePath}/log/*.log";
+          user = cfg.user;
+          group = cfg.group;
+          frequency = cfg.logrotate.frequency;
+          keep = cfg.logrotate.keep;
+          extraConfig = cfg.logrotate.extraConfig;
+        };
+      };
     };
 
     # The postgresql module doesn't currently support concepts like

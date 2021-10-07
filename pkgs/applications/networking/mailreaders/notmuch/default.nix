@@ -1,4 +1,4 @@
-{ fetchurl, fetchgit, lib, stdenv
+{ fetchurl, lib, stdenv
 , pkg-config, gnupg
 , xapian, gmime, talloc, zlib
 , doxygen, perl, texinfo
@@ -11,11 +11,11 @@
 
 stdenv.mkDerivation rec {
   pname = "notmuch";
-  version = "0.32.3";
+  version = "0.33.2";
 
   src = fetchurl {
     url = "https://notmuchmail.org/releases/notmuch-${version}.tar.xz";
-    sha256 = "114bbyjl2ppmy4pw0b5zwmi7lxiz6xd1k6zq0qcgdv7ahkwgybxy";
+    hash = "sha256:1bic1f2va136aygfy53bsgziwiidcpb7qf1v05mlza2jmgv94j14";
   };
 
   nativeBuildInputs = [
@@ -23,6 +23,7 @@ stdenv.mkDerivation rec {
     doxygen                   # (optional) api docs
     pythonPackages.sphinx     # (optional) documentation -> doc/INSTALL
     texinfo                   # (optional) documentation -> doc/INSTALL
+    pythonPackages.cffi
   ] ++ lib.optional withEmacs emacs;
 
   buildInputs = [

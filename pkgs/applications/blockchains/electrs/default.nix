@@ -1,25 +1,34 @@
 { lib
+, stdenv
 , rustPlatform
 , fetchFromGitHub
 , llvmPackages
+, rocksdb
+, Security
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "electrs";
-  version = "0.8.10";
+  version = "0.9.0";
 
   src = fetchFromGitHub {
     owner = "romanz";
     repo = pname;
     rev = "v${version}";
-    sha256 = "0q7mvpflnzzm88jbsdxgvhk9jr5mvn23hhj2iwy2grnfngxsmz3y";
+    sha256 = "04dqbn2nfzllxfcn3v9vkfy2hn2syihijr575621r1pj65pcgf8y";
   };
+
+  cargoSha256 = "0hl8q62lankrab8gq9vxmkn68drs0hw5pk0q6aiq8fxsb63dzsw0";
 
   # needed for librocksdb-sys
   nativeBuildInputs = [ llvmPackages.clang ];
   LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
 
-  cargoSha256 = "0i8npa840g4kz50n6x40z22x9apq8snw6xgjz4vn2kh67xc4c738";
+  # link rocksdb dynamically
+  ROCKSDB_INCLUDE_DIR = "${rocksdb}/include";
+  ROCKSDB_LIB_DIR = "${rocksdb}/lib";
+
+  buildInputs = lib.optionals stdenv.isDarwin [ Security ];
 
   meta = with lib; {
     description = "An efficient re-implementation of Electrum Server in Rust";

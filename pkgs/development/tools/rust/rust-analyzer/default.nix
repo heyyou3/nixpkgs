@@ -6,20 +6,23 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "rust-analyzer-unwrapped";
-  version = "2021-08-30";
-  cargoSha256 = "sha256-ba/4mQSBJin3yoIZjzFTiEIRY2eWFQI2pY1dOCZ1ALw=";
+  version = "2021-09-20";
+  cargoSha256 = "sha256-OPolZ0oXGRcKvWxXkRMjyEXzvf1p41hGfHBpbDbLJck=";
 
   src = fetchFromGitHub {
     owner = "rust-analyzer";
     repo = "rust-analyzer";
     rev = version;
-    sha256 = "sha256-mgwoJfvO3W4MYk6ikgck14e+hMjA2D+4lpnkAEeLEWA=";
+    sha256 = "sha256-k2UGz+h9++8wtV+XdGZbWysjkIDe+UNudKL46eisZzw=";
   };
 
   patches = [
     # Code format and git history check require more dependencies but don't really matter for packaging.
     # So just ignore them.
     ./ignore-git-and-rustfmt-tests.patch
+
+    # Patch for our rust 1.54.0 in nixpkgs. Remove it when we have rust >= 1.55.0
+    ./no-1-55-control-flow.patch
   ];
 
   buildAndTestSubdir = "crates/rust-analyzer";

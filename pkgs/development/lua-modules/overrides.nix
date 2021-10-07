@@ -300,7 +300,7 @@ with super;
         preBuild = self.luv.preBuild + ''
           sed -i 's,\(option(BUILD_MODULE.*\)ON,\1OFF,' CMakeLists.txt
           sed -i 's,\(option(BUILD_SHARED_LIBS.*\)OFF,\1ON,' CMakeLists.txt
-          sed -i 's,${"\${INSTALL_INC_DIR}"},${placeholder "out"}/include/luv,' CMakeLists.txt
+          sed -i 's,${"\${.*INSTALL_INC_DIR}"},${placeholder "out"}/include/luv,' CMakeLists.txt
         '';
 
         nativeBuildInputs = [ pkgs.fixDarwinDylibNames ];
@@ -361,6 +361,12 @@ with super;
     preConfigure = ''
       make all
     '';
+  });
+
+  # TODO just while testing, remove afterwards
+  # toVimPlugin should do it instead
+  gitsigns-nvim = super.gitsigns-nvim.overrideAttrs(oa: {
+    nativeBuildInputs = oa.nativeBuildInputs or [] ++ [ pkgs.vimUtils.vimGenDocHook ];
   });
 
   # aliases
